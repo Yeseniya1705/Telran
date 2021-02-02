@@ -6,6 +6,11 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class LogDto {
+	@Override
+	public String toString() {
+		return "LogDto [dateTime=" + dateTime + ", logType=" + logType + ", artifact=" + artifact + ", responseTime="
+				+ responseTime + ", result=" + result + "]";
+	}
 	public LogDto(@NotNull Date dateTime, @NotNull LogType logType, @NotEmpty String artifact, int responseTime,
 			String result) {
 		super();
@@ -15,6 +20,7 @@ public class LogDto {
 		this.responseTime = responseTime;
 		this.result = result;
 	}
+	
 	@NotNull
 public Date dateTime;
 	@NotNull
