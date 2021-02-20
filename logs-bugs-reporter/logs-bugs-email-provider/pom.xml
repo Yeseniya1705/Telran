@@ -7,22 +7,19 @@
 		<artifactId>logs-bugs-reporter</artifactId>
 		<version>0.0.1</version>
 	</parent>
-	<artifactId>logs-bugs-mongo-document</artifactId>
+	<artifactId>logs-bugs-email-provider</artifactId>
+	<description>providing email of programmer according to artifact</description>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+			<groupId>telran.logs.bugs</groupId>
+			<artifactId>logs-bugs-jpa-entities</artifactId>
+			<version>0.0.1</version>
+
 		</dependency>
 		<dependency>
-			<groupId>de.flapdoodle.embed</groupId>
-			<artifactId>de.flapdoodle.embed.mongo</artifactId>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>telran.logs.bugs</groupId>
-			<artifactId>log-bugs-dto</artifactId>
-			<version>0.0.1</version>
-		</dependency>
-		
 	</dependencies>
 </project>

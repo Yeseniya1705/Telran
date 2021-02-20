@@ -28,36 +28,22 @@ static Logger LOG = LoggerFactory.getLogger(LogsDbPopulatorAppl.class);
 		SpringApplication.run(LogsDbPopulatorAppl.class, args);
 
 	}
-	@Value("${app-binding-name:exceptions-out-0}")
-	String bindingName;
-	@Autowired
-	StreamBridge streamBridge;
+	
 	@Bean
 	
 	Consumer<LogDto> getLogDtoConsumer() {
 		return this::takeAndSaveLogDto;
 	}
-	@Autowired
-	Validator validator;
+	
 	@Autowired
 	LogsRepo logsRepository;
 	void takeAndSaveLogDto(LogDto logDto) {
 		// taking and saving to MongoDB logDto
 		LOG.debug("received log: {}", logDto);
-		 Set<ConstraintViolation<LogDto>> violations = validator.validate(logDto);
-		 if (!violations.isEmpty()) {
-			violations.forEach(cv -> LOG.error("logDto : {}; field: {}; message: {}",logDto,
-					cv.getPropertyPath(), cv.getMessage()));
-			LogDto exceptionLog = new LogDto(new Date(),
-					LogType.BAD_REQUEST_EXCEPTION, LogsDbPopulatorAppl.class.getName(), 0, violations.toString());
-			logsRepository.save(new LogDoc(exceptionLog));
-			LOG.debug("log: {} saved to Mongo collection", exceptionLog);
-			streamBridge.send(bindingName, exceptionLog);
-			LOG.debug("log: {} sent to binding name: {}", exceptionLog, bindingName);
-		 } else {
-			 logsRepository.save(new LogDoc(logDto));
-			 LOG.debug("log: {} saved to Mongo collection", logDto);
-		 }
+		 
+			logsRepository.save(new LogDoc(logDto));
+			LOG.debug("log: {} saved to Mongo collection", logDto);
+			
 		
 	}
 

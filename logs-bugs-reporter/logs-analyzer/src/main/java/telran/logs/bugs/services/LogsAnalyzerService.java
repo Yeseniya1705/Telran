@@ -1,6 +1,11 @@
 package telran.logs.bugs.services;
 
+import java.util.Date;
+import java.util.Set;
 import java.util.function.Consumer;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +22,32 @@ import telran.logs.bugs.dto.LogType;
 @Service
 public class LogsAnalyzerService {
 	static Logger LOG=LoggerFactory.getLogger(LogsAnalyzerService.class);
-	@Value("${app-binding-name:exceptions-out-0}")
+	@Value("${app-binding-name-exception:exceptions-out-0}")
 	String bindingName;
+	@Value("${app-binding-name-logs:logs-out-0}")
+	String bindingNameLogs;
+	@Value("${app-logs-provider-artifact:logs-provider}")
+	String logsProviderArtifact;
 	@Autowired
 StreamBridge streamBridg;
+	@Autowired
+	Validator validator;
 	@Bean
 	Consumer <LogDto> getAnalyzerBean(){
 		return this:: analyzerMethod;
 	}
 	void analyzerMethod(LogDto logDto) {
 		LOG.debug("recievd log{}",logDto);
-		if(logDto.logType!=null && logDto.logType!=LogType.NO_EXEPTION) {
-			streamBridg.send(bindingName, logDto);
+		Set<ConstraintViolation<LogDto>>violations=validator.validate(logDto);
+		final LogDto logForEach=logDto;
+		if(!violations.isEmpty()){
+			violations.forEach(cv->LOG.error("logDto:{};field:{};message:{}",logForEach,cv.getPropertyPath(),cv.getMessage()));
+			logDto=new LogDto(new Date(),LogType.BAD_REQUEST_EXCEPTION,logsProviderArtifact,0,violations.toString());
 		}
+		if(logDto.logType!=LogType.NO_EXEPTION) {
+			streamBridg.send(bindingName, logDto);
+			LOG.debug("log:{} sent to bring name:{}",logDto,bindingName);
+		}
+		streamBridg.send(bindingNameLogs, logDto);
 	}
 }
